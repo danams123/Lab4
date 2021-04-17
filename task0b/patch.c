@@ -7,7 +7,7 @@
 #define SYS_CLOSE 6
 #define SYS_LSEEK 19
 
-#define _O_RDWR 0x0002
+#define O_RDWR 2
 #define SEEK_CURR 0x291
 
 extern int system_call(int, ...);

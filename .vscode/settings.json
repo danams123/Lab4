@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "dirent.h": "c",
+        "crtdefs.h": "c"
     }
 }
