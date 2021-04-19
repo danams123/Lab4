@@ -1,4 +1,4 @@
-#include "../lab4_util.h"
+#include "lab4_util.h"
 extern int system_call(int, ...);
 
 #define EXIT 1
@@ -14,12 +14,12 @@ extern int system_call(int, ...);
 #define O_RDWR 2
 #define O_RDONLY 0
 #define O_WRONLY 1
+#define O_CREAT 64
 
 int main(int argc, char **argv)
 {
 
     int i;
-    int debugMode = 0;
     int c;
     int in = STDIN;
     int out = STDOUT;
@@ -28,15 +28,9 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; i++)
     {
-        if (strncmp(argv[i], "-D", 2) == 0)
-        {
-            debugMode = 1;
-            system_call(SYS_WRITE, STDERR, "-D\n", 3);
-        }
-
         if (strncmp(argv[i], "-o", 2) == 0)
         {
-            out = system_call(SYS_OPEN, argv[i] + 2, O_WRONLY, 0777);
+            out = system_call(SYS_OPEN, argv[i] + 2, O_WRONLY | O_CREAT, 0777);
             if (out < 0)
                 system_call(EXIT, 0x55);
         }

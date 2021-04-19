@@ -1,4 +1,4 @@
-#include "../lab4_util.h"
+#include "lab4_util.h"
 
 #define EXIT 1
 #define SYS_READ 3
@@ -49,6 +49,12 @@ typedef struct ent
     char d_name[];
 } ent;
 
+void e_gracefully(int fd)
+{
+    system_call(SYS_CLOSE, fd);
+    system_call(EXIT, 0x55);
+}
+
 int main(int argc, char *argv[])
 {
     int fd;
@@ -81,7 +87,7 @@ int main(int argc, char *argv[])
 
     nread = system_call(SYS_GETDENTS, fd, buf, MAX_SIZE);
     if (nread < 0)
-        system_call(EXIT, 0x55);
+        e_gracefully(fd);
 
     for (bpos = 32; bpos < nread;)
     {
@@ -99,16 +105,16 @@ int main(int argc, char *argv[])
         {
             check = system_call(SYS_WRITE, STDOUT, entp->d_name, strlen(entp->d_name));
             if (check < 0)
-                system_call(EXIT, 0x55);
+                e_gracefully(fd);
             check = system_call(SYS_WRITE, STDOUT, "\n", 1);
             if (check < 0)
-                system_call(EXIT, 0x55);
+                e_gracefully(fd);
             check = system_call(SYS_WRITE, STDOUT, type, strlen(type));
             if (check < 0)
-                system_call(EXIT, 0x55);
+                e_gracefully(fd);
             check = system_call(SYS_WRITE, STDOUT, "\n", 1);
             if (check < 0)
-                system_call(EXIT, 0x55);
+                e_gracefully(fd);
 
             if (infect)
             {
@@ -118,5 +124,6 @@ int main(int argc, char *argv[])
 
         bpos += entp->len;
     }
+    system_call(SYS_CLOSE, fd);
     return 0;
 }

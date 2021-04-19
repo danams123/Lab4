@@ -1,4 +1,4 @@
-#include "../lab4_util.h"
+#include "lab4_util.h"
 
 #define EXIT 1
 #define SYS_READ 3
@@ -40,6 +40,12 @@ enum
 
 extern int system_call(int, ...);
 
+void e_gracefully(int fd)
+{
+    system_call(SYS_CLOSE, fd);
+    system_call(EXIT, 0x55);
+}
+
 typedef struct ent
 {
     int inode;
@@ -69,11 +75,12 @@ int main(int argc, char *argv[])
         entp = (struct ent *)(buf + bpos);
         check = system_call(SYS_WRITE, STDOUT, entp->d_name, strlen(entp->d_name));
         if (check < 0)
-            system_call(EXIT, 0x55);
+            e_gracefully(fd);
         check = system_call(SYS_WRITE, STDOUT, "\n", 1);
         if (check < 0)
-            system_call(EXIT, 0x55);
+            e_gracefully(fd);
         bpos += entp->len;
     }
+    system_call(SYS_CLOSE, fd);
     return 0;
 }

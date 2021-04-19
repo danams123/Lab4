@@ -1,4 +1,4 @@
-#include "../lab4_util.h"
+#include "lab4_util.h"
 extern int system_call(int, ...);
 
 #define EXIT 1
@@ -16,22 +16,9 @@ extern int system_call(int, ...);
 int main(int argc, char **argv)
 {
 
-    int i;
-    int debugMode = 0;
     int c;
     int lowerCase;
     int check;
-
-    for (i = 1; i < argc; i++)
-    {
-        if (strncmp(argv[i], "-D", 2) == 0)
-        {
-            debugMode = 1;
-            check = system_call(SYS_WRITE, STDERR, "-D\n", 3);
-            if (check <= 0)
-                system_call(EXIT, 0x55);
-        }
-    }
 
     while (1)
     {
@@ -48,6 +35,5 @@ int main(int argc, char **argv)
         if (check <= 0)
             system_call(EXIT, 0x55);
     }
-
     return 0;
 }
